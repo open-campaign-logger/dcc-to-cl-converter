@@ -1,0 +1,103 @@
+<html>
+  <head>
+    <title>Convert DCC Characters to CL vNext Log Entries</title>
+    <style>
+      * {
+        font-family: sans-serif;
+      }
+      body {
+        padding: 30px;
+      }
+      div {
+        margin: 10px;
+      }
+      textarea {
+        width: 50%;
+        height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Convert DCC Characters to CL vNext Log Entries</h1>
+    <div>
+      <label>
+        <b>Template</b>
+        <br />
+        <textarea id="template">
+## Name: @"Name"
+Occupation: ^"{occTitle}" - Alignment: Law/Neutral/Chaos - XP: {xp}
+
+AC: {armorClass}
+HP: {hitPoints}
+
+| | | | | | |
+| ---: | ---: | ---: | --- | ---: | ---: |
+| Strength | {strengthScore} | {strengthMod} | | Reflex | {saveReflex} |
+| Agility | {agilityScore} | {agilityMod} | | Fortitude | {saveFort} |
+| Stamina | {staminaScore} | {staminaMod} | | Will | {saveWill} |
+| Personality | {personalityScore} | {personalityMod} |
+| Intelligence | {intelligenceScore} | {intelligenceMod} | | Speed | {speed}
+| Luck | {luckScore} | {luckMod} | | Init | {initiative}
+
+Weapons:
+- {weapon} {attackMod} ({attackDamage})
+
+Equipment:
+- Starting Funds: {startingFunds}
+- Trade Good: {tradeGood}
+- {equipment}
+- {equipment2}
+- {equipment3}
+
+Notes:
+- Lucky Sign: {luckySign}
+- Languages: {languages}
+- Racial Traits:  {racialTraits}
+        </textarea>
+      </label>
+    </div>
+    <div>
+      <label>
+        <b>Input</b>
+        <br />
+        <textarea id="input"></textarea>
+      </label>
+    </div>
+    <div>
+      <button type="button" onclick="convert();">Convert</button>
+    </div>
+    <div>
+      <label>
+        <b>Output</b>
+        <br />
+        <textarea id="output"></textarea>
+      </label>
+    </div>
+    <script>
+      function convert() {
+        var template = document.querySelector("#template").value;
+        var input = document.querySelector("#input").value;
+
+        var characters = JSON.parse(input).characters;
+
+        var logEntries = characters.map(function (c) {
+          var rawText = template;
+
+          Object.getOwnPropertyNames(c).forEach(function (n) {
+            rawText = rawText.replace("{" + n + "}", c[n]);
+          });
+
+          return { rawText };
+        });
+
+        var output = JSON.stringify({
+          version: 2,
+          type: "log",
+          logEntries,
+        });
+
+        document.querySelector("#output").value = output;
+      }
+    </script>
+  </body>
+</html>
